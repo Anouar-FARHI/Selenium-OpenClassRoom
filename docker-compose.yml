@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  #Service poru l'application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3007:3000" # Mappe le port 3000 du conteneur au port 3007 de l'hôte
+    depends_on:
+      - selenium #Dépend du service Selnium
+  
+  #Service pour Selenium
+  selenium:
+    image: selenium/standalone-chrome
+    ports:
+      - "4444:4444"
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - app
+      - selenium #Dépend du service Selnium
+    environment:
+      - SELENIUM_HUB_HOST=selenium
+      - SELENIUM_HUB_PORT=4444
