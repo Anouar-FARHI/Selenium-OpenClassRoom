@@ -29,7 +29,7 @@ def wait_for_selenium_grid(host, port, timeout=60):
                 print("Selenium Grid est prêt.")
                 return True
         except requests.ConnectionError as e:
-            logger.log("error-selenium", f"Erreur de connexion selenium :{e}" )
+            # logger.log("error-selenium", f"Erreur de connexion selenium :{e}" )
             pass
         logger.log("log-selenium", "En attente de Selenium Grid...")
         print("En attente de Selenium Grid...")

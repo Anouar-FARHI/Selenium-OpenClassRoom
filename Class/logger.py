@@ -8,15 +8,18 @@ class Logger:
         self.base_log_path = "/app/logs"  # Chemin de base pour les logs à l'intérieur du conteneur
     
     def get_log_file(self, log_type):
+        # Assurez-vous que le dossier pour les logs généraux est créé
+        general_log_directory = os.path.join(self.base_log_path, "log")
+        os.makedirs(general_log_directory, exist_ok=True)
+        log_general_path = os.path.join(general_log_directory, f"log-{self.date_str}.log")
+        self.log_files["log"] = log_general_path
+
+        # Créez le dossier et le fichier pour le type de log spécifique si nécessaire
         if log_type not in self.log_files:
             log_directory = os.path.join(self.base_log_path, log_type)
             os.makedirs(log_directory, exist_ok=True)
             log_file_path = os.path.join(log_directory, f"{log_type}-{self.date_str}.log")
             self.log_files[log_type] = log_file_path
-        
-        # Assurez-vous que le chemin pour le fichier log général est toujours là
-        log_general_path = os.path.join(self.base_log_path, "log", f"log-{self.date_str}.log")
-        self.log_files["log"] = log_general_path
         
         return self.log_files[log_type]
 
