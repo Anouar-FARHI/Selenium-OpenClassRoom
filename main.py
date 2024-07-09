@@ -5,8 +5,10 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from Class.logger import Logger  # Assurez-vous que l'importation est correcte
+from Class.cookies import CookieHandler
 
 logger = Logger()
+
 
 # Récupère les variables d'environnement pour le Selenium Hub
 selenium_hub_host = os.getenv('SELENIUM_HUB_HOST', 'selenium')
@@ -17,6 +19,8 @@ chrome_options = Options()
 chrome_options.add_argument("--headless")  # Exécute Chrome en mode headless (sans interface graphique)
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--verbose")
+chrome_options.add_argument("--log-level=0")
 
 # Fonction pour vérifier la disponibilité du Selenium Grid
 def wait_for_selenium_grid(host, port, timeout=60):
@@ -58,19 +62,21 @@ else:
     logger.log("error-selenium", "Selenium Grid n'est pas prêt après plusieurs tentatives")
     raise Exception("Selenium Grid n'est pas prêt après plusieurs tentatives")
 
-# Ouvre la page d'accueil de Reddit
+# Ouvre la page d'accueil de openclassrooms
 try:
-    driver.get('https://www.reddit.com/')
-    logger.log("access-reddit", "Félicitations ! L'accès à l'URL a été réussi.")
+    driver.get('https://openclassrooms.com/fr/')
+    logger.log("access-openclassrooms", "Félicitations ! L'accès à l'URL a été réussi.")
     print("Félicitations ! L'accès à l'URL a été réussi.")
 except Exception as e:
-    logger.log("error-reddit", f"Erreur lors de l'accès à l'URL: {e}")
+    logger.log("error-openclassrooms", f"Erreur lors de l'accès à l'URL: {e}")
     print("Erreur lors de l'accès à l'URL:", e)
     driver.quit()
     raise
 
 # Attendre que les éléments se chargent
-time.sleep(5)
+time.sleep(2)
+cookies = CookieHandler(driver)
+cookies.decline_cookies()
 
 # Ferme le WebDriver
 logger.log("access-selenium", "Fermeture du WebDriver.")
