@@ -25,16 +25,16 @@ def wait_for_selenium_grid(host, port, timeout=60):
         try:
             response = requests.get(url)
             if response.status_code == 200:
-                logger.log("access", "Selenium Grid est prêt.")
+                logger.log("access-selenium", "Selenium Grid est prêt.")
                 print("Selenium Grid est prêt.")
                 return True
         except requests.ConnectionError as e:
-            logger.log("error", f"Erreur de connexion selenium :{e}" )
+            logger.log("error-selenium", f"Erreur de connexion selenium :{e}" )
             pass
-        logger.log("log", "En attente de Selenium Grid...")
+        logger.log("log-selenium", "En attente de Selenium Grid...")
         print("En attente de Selenium Grid...")
         time.sleep(1)
-    logger.log("error", "Selenium Grid n'est pas prêt après plusieurs tentatives")
+    logger.log("error-selenium", "Selenium Grid n'est pas prêt après plusieurs tentatives")
     raise Exception("Selenium Grid n'est pas prêt après plusieurs tentatives")
 
 # Vérifie que le Selenium Grid est prêt
@@ -47,24 +47,24 @@ for attempt in range(10):
             command_executor=f'http://{selenium_hub_host}:{selenium_hub_port}/wd/hub',
             options=chrome_options
         )
-        logger.log("access", "Connexion au Selenium Grid réussie.")
+        logger.log("access-selenium", "Connexion au Selenium Grid réussie.")
         print("Connexion au Selenium Grid réussie.")
         break
     except Exception as e:
-        logger.log("error", f"Tentative {attempt + 1}: Selenium Grid n'est pas prêt, attente... Erreur: {e}")
+        logger.log("error-selenium", f"Tentative {attempt + 1}: Selenium Grid n'est pas prêt, attente... Erreur: {e}")
         print(f"Tentative {attempt + 1}: Selenium Grid n'est pas prêt, attente... Erreur: {e}")
         time.sleep(5)
 else:
-    logger.log("error", "Selenium Grid n'est pas prêt après plusieurs tentatives")
+    logger.log("error-selenium", "Selenium Grid n'est pas prêt après plusieurs tentatives")
     raise Exception("Selenium Grid n'est pas prêt après plusieurs tentatives")
 
 # Ouvre la page d'accueil de Reddit
 try:
     driver.get('https://www.reddit.com/')
-    logger.log("access", "Félicitations ! L'accès à l'URL a été réussi.")
+    logger.log("access-reddit", "Félicitations ! L'accès à l'URL a été réussi.")
     print("Félicitations ! L'accès à l'URL a été réussi.")
 except Exception as e:
-    logger.log("error", f"Erreur lors de l'accès à l'URL: {e}")
+    logger.log("error-reddit", f"Erreur lors de l'accès à l'URL: {e}")
     print("Erreur lors de l'accès à l'URL:", e)
     driver.quit()
     raise
@@ -73,5 +73,6 @@ except Exception as e:
 time.sleep(5)
 
 # Ferme le WebDriver
-logger.log("access", "Fermeture du WebDriver.")
+logger.log("access-selenium", "Fermeture du WebDriver.")
+logger.log("success", "Fermeture du WebDriver.")
 driver.quit()
