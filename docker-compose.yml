@@ -27,3 +27,5 @@ services:
     environment:
       - SELENIUM_HUB_HOST=selenium
       - SELENIUM_HUB_PORT=4444
+    volumes:
+      - ./logs:/app/logs  # Monte le répertoire des logs sur l'hôte

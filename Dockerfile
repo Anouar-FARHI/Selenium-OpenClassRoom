@@ -3,6 +3,8 @@ FROM python:3.8-slim
 
 # Installer les dépendances Python nécessaires
 RUN pip install selenium
+RUN pip install urllib3
+RUN pip install requests
 
 # Installe wget, gnupg2 et unzip
 RUN apt-get update && apt-get install -y wget gnupg2 unzip

@@ -1,7 +1,12 @@
 import os
+import time
+import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from Class.logger import Logger  # Assurez-vous que l'importation est correcte
+
+logger = Logger()
 
 # Récupère les variables d'environnement pour le Selenium Hub
 selenium_hub_host = os.getenv('SELENIUM_HUB_HOST', 'selenium')
@@ -13,32 +18,60 @@ chrome_options.add_argument("--headless")  # Exécute Chrome en mode headless (s
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 
-# Initialise le WebDriver pour se connecter au Selenium Grid
-driver = webdriver.Remote(
-    command_executor=f'http://{selenium_hub_host}:{selenium_hub_port}/wd/hub',
-    options=chrome_options
-)
+# Fonction pour vérifier la disponibilité du Selenium Grid
+def wait_for_selenium_grid(host, port, timeout=60):
+    url = f'http://{host}:{port}/wd/hub/status'
+    for _ in range(timeout):
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                logger.log("access", "Selenium Grid est prêt.")
+                print("Selenium Grid est prêt.")
+                return True
+        except requests.ConnectionError as e:
+            logger.log("error", f"Erreur de connexion selenium :{e}" )
+            pass
+        logger.log("log", "En attente de Selenium Grid...")
+        print("En attente de Selenium Grid...")
+        time.sleep(1)
+    logger.log("error", "Selenium Grid n'est pas prêt après plusieurs tentatives")
+    raise Exception("Selenium Grid n'est pas prêt après plusieurs tentatives")
 
-# Ouvre la page contenant le composant
-driver.get('http://app:3000')  # Utilise le port 3000 pour l'URL de l'application
+# Vérifie que le Selenium Grid est prêt
+wait_for_selenium_grid(selenium_hub_host, selenium_hub_port)
 
-# Trouve le bouton par son texte
-button = driver.find_element(By.XPATH, "//button[text()='Click Me']")
+# Initialiser le WebDriver pour se connecter au Selenium Grid
+for attempt in range(10):
+    try:
+        driver = webdriver.Remote(
+            command_executor=f'http://{selenium_hub_host}:{selenium_hub_port}/wd/hub',
+            options=chrome_options
+        )
+        logger.log("access", "Connexion au Selenium Grid réussie.")
+        print("Connexion au Selenium Grid réussie.")
+        break
+    except Exception as e:
+        logger.log("error", f"Tentative {attempt + 1}: Selenium Grid n'est pas prêt, attente... Erreur: {e}")
+        print(f"Tentative {attempt + 1}: Selenium Grid n'est pas prêt, attente... Erreur: {e}")
+        time.sleep(5)
+else:
+    logger.log("error", "Selenium Grid n'est pas prêt après plusieurs tentatives")
+    raise Exception("Selenium Grid n'est pas prêt après plusieurs tentatives")
 
-# Vérifie la couleur du bouton
-assert button.value_of_css_property('background-color') == 'rgba(0, 0, 255, 1)', "Le bouton n'est pas bleu"
+# Ouvre la page d'accueil de Reddit
+try:
+    driver.get('https://www.reddit.com/')
+    logger.log("access", "Félicitations ! L'accès à l'URL a été réussi.")
+    print("Félicitations ! L'accès à l'URL a été réussi.")
+except Exception as e:
+    logger.log("error", f"Erreur lors de l'accès à l'URL: {e}")
+    print("Erreur lors de l'accès à l'URL:", e)
+    driver.quit()
+    raise
 
-# Vérifie la taille du bouton
-assert button.value_of_css_property('font-size') == '16px', "La taille de la police n'est pas correcte"
-assert button.value_of_css_property('padding') == '10px 20px', "Le padding n'est pas correct"
-
-# Redimensionne la fenêtre pour tester la responsivité
-driver.set_window_size(500, 800)
-button = driver.find_element(By.XPATH, "//button[text()='Click Me']")
-
-# Vérifie la taille responsive du bouton
-assert button.value_of_css_property('font-size') == '14px', "La taille de la police responsive n'est pas correcte"
-assert button.value_of_css_property('padding') == '8px 16px', "Le padding responsive n'est pas correct"
+# Attendre que les éléments se chargent
+time.sleep(5)
 
 # Ferme le WebDriver
+logger.log("access", "Fermeture du WebDriver.")
 driver.quit()
