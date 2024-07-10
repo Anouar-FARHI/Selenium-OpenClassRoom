@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from Class.logger import Logger  # Assurez-vous que l'importation est correcte
 from Class.cookies import CookieHandler
+from Class.login import OpenClassRoomsLogin
 
 logger = Logger()
 
@@ -76,7 +77,10 @@ except Exception as e:
 # Attendre que les éléments se chargent
 time.sleep(2)
 cookies = CookieHandler(driver)
-cookies.decline_cookies()
+cookies.accept_cookies()
+
+login = OpenClassRoomsLogin(driver,"anouar.farhi@gmail.com", "oT8FvWWlb59nIIW")
+login.login()
 
 # Ferme le WebDriver
 logger.log("access-selenium", "Fermeture du WebDriver.")
