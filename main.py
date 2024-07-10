@@ -7,6 +7,7 @@ from selenium.webdriver.chrome.options import Options
 from Class.logger import Logger  # Assurez-vous que l'importation est correcte
 from Class.cookies import CookieHandler
 from Class.login import OpenClassRoomsLogin
+from Class.closePopUp import ClosePopUp
 
 logger = Logger()
 
@@ -81,6 +82,9 @@ cookies.accept_cookies()
 
 login = OpenClassRoomsLogin(driver,"anouar.farhi@gmail.com", "oT8FvWWlb59nIIW")
 login.login()
+
+closePopUp = ClosePopUp(driver)
+closePopUp.close_pop_up()
 
 # Ferme le WebDriver
 logger.log("access-selenium", "Fermeture du WebDriver.")
